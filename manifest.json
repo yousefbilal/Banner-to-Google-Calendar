@@ -1,0 +1,16 @@
+{
+    "manifest_version": 3,
+    "name": "Hello Extensions",
+    "description": "Base Level Extension",
+    "version": "1.0",
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": "popup.png"
+    },
+
+    "oauth2": {
+        "client_id":"85232819736-0csjg4ksiikoquplsgbea5uklmiphg09.apps.googleusercontent.com",
+        "scopes": ["https://www.googleapis.com/auth/calendar"]
+    },
+    "permissions": ["identity"]
+}
