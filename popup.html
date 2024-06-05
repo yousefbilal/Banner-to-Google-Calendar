@@ -6,14 +6,13 @@
   </head>
   <body>
     <p>Google Calendar API Quickstart</p>
-    <input id="textin" type="text" placeholder="Calendar" />
-    <!--Add buttons to initiate auth sequence and sign out-->
-    <button id="authorize_button" >Authorize</button>
-    <button id="signout_button" >Sign Out</button>
-
+    <form id="form">
+      <input id="textin" type="text" placeholder="Calendar name" required/>
+      <button id="authorize_button" type="submit" >submit</button>
+    </form>
     <pre id="content" style="white-space: pre-wrap;"></pre>
 
-    <script type="module" src="main.js"> </script>
+    <script type="module" src="popup.js"> </script>
 
   </body>
 </html>

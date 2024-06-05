@@ -7,6 +7,7 @@
     "parcel": "^2.12.0"
   },
   "scripts": {
-    "build": "parcel build manifest.json --config @parcel/config-webextension"
+    "build": "rm -rf ./dist && parcel build manifest.json --config @parcel/config-webextension",
+    "build:test": "parcel build manifest.json --config @parcel/config-webextension --no-optimize"
   }
 }

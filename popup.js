@@ -57,7 +57,8 @@ const createCalendar = async (calendarName, headers) => {
     return await res.json();
 }
 
-const createSchedule = async () => {
+const createSchedule = async (event) => {
+    event.preventDefault();
     const token = await getAuthToken();
     if (!token) {
         console.error('Failed to obtain token');
@@ -101,8 +102,9 @@ const createSchedule = async () => {
 
 const insertEvent = async (calendarName, headers, eventData, colors) => {
     const { elem: eventInfo, day } = eventData;
+    console.log(eventInfo, day)
     let crn = eventInfo[1].split(' ')[0];
-
+    
     let [startTime, endTime] = eventInfo[2].split('-'); 
     startTime = `${day} ${startTime}`;
     endTime = `${day} ${endTime}`;
@@ -151,12 +153,12 @@ const retrieveTableData = async () =>  {
     const response = await chrome.tabs.sendMessage(tab.id, { message: 'retrieve_table_data' });
     
     console.log('response', response)
-    if (!response) {
+    if (!response.elems) {
         console.error('Failed to retrieve table data');
         return;
     }
 
-    return response.elems.map(elem => elem.split('\n'));
+    return response.elems
 }
 
-document.getElementById('authorize_button').onclick = createSchedule;
+document.getElementById('form').onsubmit = createSchedule;
