@@ -112,7 +112,7 @@ const insertEvent = async (calendarName, headers, eventData, colors) => {
     startTime = moment(startTime, "dddd h:mm a").tz("Asia/Dubai").format();
     endTime = moment(endTime, "dddd h:mm a").tz("Asia/Dubai").format();
 
-    colors.colorMap[crn] = colors.colorMap[crn] || colors.colorCounter++;
+    colors.colorMap[crn] = colors.colorMap[crn] ?? colors.colorCounter++;
 
     const body = {
         summary: eventInfo[0],
