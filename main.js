@@ -100,18 +100,21 @@ const createSchedule = async () => {
 
 
 const insertEvent = async (calendarName, headers, eventData, colors) => {
-    let crn = eventData[1].split(' ')[0];
+    const { elem: eventInfo, day } = eventData;
+    let crn = eventInfo[1].split(' ')[0];
 
-    let [startTime, endTime] = eventData[2].split('-'); 
+    let [startTime, endTime] = eventInfo[2].split('-'); 
+    startTime = `${day} ${startTime}`;
+    endTime = `${day} ${endTime}`;
 
-    startTime = moment(startTime, "h:mm a").tz("Asia/Dubai").format();
-    endTime = moment(endTime, "h:mm a").tz("Asia/Dubai").format();
+    startTime = moment(startTime, "dddd h:mm a").tz("Asia/Dubai").format();
+    endTime = moment(endTime, "dddd h:mm a").tz("Asia/Dubai").format();
 
     colors.colorMap[crn] = colors.colorMap[crn] || colors.colorCounter++;
 
     const body = {
-        summary: eventData[0],
-        location: eventData[3],
+        summary: eventInfo[0],
+        location: eventInfo[3],
         start: {
             dateTime: startTime,
             timeZone: 'Asia/Dubai'
@@ -121,6 +124,9 @@ const insertEvent = async (calendarName, headers, eventData, colors) => {
             timeZone: 'Asia/Dubai'
         },
         colorId: colors.colorMap[crn],
+        recurrence: [
+            'RRULE:FREQ=WEEKLY'
+        ]
     };
 
     let res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarName}/events`, {
