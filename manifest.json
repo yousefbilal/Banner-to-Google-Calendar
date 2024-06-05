@@ -12,5 +12,12 @@
         "client_id":"85232819736-0csjg4ksiikoquplsgbea5uklmiphg09.apps.googleusercontent.com",
         "scopes": ["https://www.googleapis.com/auth/calendar"]
     },
-    "permissions": ["identity"]
+    "permissions": ["identity", "tabs"],
+    
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["content_script.js"]
+        }
+    ]
 }
