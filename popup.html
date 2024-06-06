@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Google Calendar API Quickstart</title>
+    <title>Banner -> Google Calendar</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="popup.css" />
     <meta charset="utf-8" />
   </head>
   <body>
-    <p>Google Calendar API Quickstart</p>
-    <form id="form">
-      <input id="textin" type="text" placeholder="Calendar name" required/>
-      <button id="authorize_button" type="submit" >submit</button>
-    </form>
-    <pre id="content" style="white-space: pre-wrap;"></pre>
-
+    <div id="flex">
+      <div>Banner to Google Calendar</div>
+      <div id="error" style="display: none;"></div>
+      <form id="form">
+        <input id="textin" type="text" placeholder="Calendar name" required/>
+        <button id="submit" type="submit" >submit</button>
+      </form>
+    </div>
     <script type="module" src="popup.js"> </script>
 
   </body>

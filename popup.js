@@ -161,4 +161,19 @@ const retrieveTableData = async () =>  {
     return response.elems
 }
 
+
+// create a function that displays the error on the DOM
+const displayError = (error) => {
+    const errorDiv = document.getElementById('error');
+    errorDiv.textContent = error;
+    errorDiv.style.display = 'block';
+    errorDiv.style.color = 'red';
+
+    setTimeout(() => {
+        errorDiv.textContent = '';
+        errorDiv.style.display = 'none';
+    }, 3000);
+
+}
+
 document.getElementById('form').onsubmit = createSchedule;
