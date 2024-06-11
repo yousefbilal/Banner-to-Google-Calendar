@@ -81,12 +81,10 @@ const createSchedule = async (event) => {
         return;
     }
     // console.log(data);
-
-    const tableData = await retrieveTableData();
-    console.log(tableData);
-
-
+    
     try {
+        const tableData = await retrieveTableData();
+        console.log(tableData);
         let promises = Object.values(tableData).map((eventData, index) => insertEvent(data.id, headers, eventData, index % 11 + 1))
         // .map(eventData => insertEvent(data.id, headers, eventData, colors));
         let results = await Promise.all(promises);
@@ -94,13 +92,27 @@ const createSchedule = async (event) => {
         displayMessage('Schedule created successfully', 'green');
 
     } catch (error) {
+
         console.error(error);
         displayMessage(error, 'red');
+        await deleteSchedule(data.id, headers);
         return;
     }
 }
 
+const deleteSchedule = async (calendarName, headers) => {
 
+    let res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarName}`, {
+        method: 'DELETE',
+        headers: headers
+    });
+
+    if (!res.ok) {
+        console.error('Failed to delete calendar:', res.status);
+    }
+
+    return await res.json();
+}
 
 const insertEvent = async (calendarName, headers, eventData, colorId) => {
     
@@ -171,8 +183,7 @@ const displayMessage = (message, color) => {
     messageDiv.textContent = message;
     messageDiv.style.display = 'block';
     messageDiv.style.color = color;
-    messageDiv.style.fontWeight = 'bold';
-    messageDiv.style.border = '3px solid';
+    messageDiv.style.border = '2px solid';
     messageDiv.style.borderRadius = '10px';
     messageDiv.style.borderColor = color;
     messageDiv.style.padding = '5px';
@@ -181,7 +192,7 @@ const displayMessage = (message, color) => {
     setTimeout(() => {
         messageDiv.textContent = '';
         messageDiv.style.display = 'none';
-    }, 3000);
+    }, 5000);
 
 }
 
