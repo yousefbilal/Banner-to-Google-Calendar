@@ -1,4 +1,4 @@
-import moment from "moment-timezone";
+import moment from "moment";
 
 const getAuthToken = async () => {
     // Check localStorage for existing token
@@ -11,8 +11,8 @@ const getAuthToken = async () => {
             chrome.identity.removeCachedAuthToken({ token: token });
             token = null; // Clear invalid token
         } else {
-            console.log('Using existing token from localStorage');
-            console.log(token)
+            // console.log('Using existing token from localStorage');
+            // console.log(token)
             return token; // Return valid token if not expired
         }
     }
@@ -21,14 +21,14 @@ const getAuthToken = async () => {
     let newToken;
     try {
         newToken = await chrome.identity.getAuthToken({ 'interactive': true });
-        console.log(`obtained new token ${newToken}`);
+        // console.log(`obtained new token ${newToken}`);
     } catch (error) {
         console.error('Failed to obtain token:', error);
         return null;
     }   
 
     token = newToken.token;
-    console.log(newToken)
+    // console.log(newToken)
     localStorage.setItem('authToken', token);
 
     // Set expiration time (optional)
@@ -77,46 +77,49 @@ const createSchedule = async (event) => {
         data = await createCalendar(calendarName, headers);
     } catch (error) {
         console.error(error);
+        displayMessage(error, 'red');
         return;
     }
-    console.log(data);
+    // console.log(data);
 
     const tableData = await retrieveTableData();
     console.log(tableData);
 
-    const colors = {
-        colorCounter: 0,
-        colorMap: {}
-    }
+
     try {
-        let promises = tableData.map(eventData => insertEvent(data.id, headers, eventData, colors));
+        let promises = Object.values(tableData).map((eventData, index) => insertEvent(data.id, headers, eventData, index % 11 + 1))
+        // .map(eventData => insertEvent(data.id, headers, eventData, colors));
         let results = await Promise.all(promises);
-        console.log(results);
+        // console.log(results);
+        displayMessage('Schedule created successfully', 'green');
+
     } catch (error) {
         console.error(error);
+        displayMessage(error, 'red');
         return;
     }
 }
 
 
 
-const insertEvent = async (calendarName, headers, eventData, colors) => {
-    const { elem: eventInfo, day } = eventData;
-    console.log(eventInfo, day)
-    let crn = eventInfo[1].split(' ')[0];
+const insertEvent = async (calendarName, headers, eventData, colorId) => {
     
-    let [startTime, endTime] = eventInfo[2].split('-'); 
-    startTime = `${day} ${startTime}`;
-    endTime = `${day} ${endTime}`;
+    const dayMapping = {
+        'Monday': 'MO',
+        'Tuesday': 'TU',
+        'Wednesday': 'WE',
+        'Thursday': 'TH',
+        'Friday': 'FR',
+        'Saturday': 'SA',
+        'Sunday': 'SU'
+    };
 
-    startTime = moment(startTime, "dddd h:mm a").tz("Asia/Dubai").format();
-    endTime = moment(endTime, "dddd h:mm a").tz("Asia/Dubai").format();
-
-    colors.colorMap[crn] = colors.colorMap[crn] ?? colors.colorCounter++;
-
+    let formattedDays = eventData.day.map(day => dayMapping[day]).join(',');
+    let startTime = moment(eventData.startTime, "dddd h:mm a").toISOString();
+    let endTime = moment(eventData.endTime, "dddd h:mm a").toISOString();
     const body = {
-        summary: eventInfo[0],
-        location: eventInfo[3],
+        summary: eventData.course,
+        location: eventData.location,
         start: {
             dateTime: startTime,
             timeZone: 'Asia/Dubai'
@@ -125,9 +128,9 @@ const insertEvent = async (calendarName, headers, eventData, colors) => {
             dateTime: endTime,
             timeZone: 'Asia/Dubai'
         },
-        colorId: colors.colorMap[crn],
+        colorId: colorId,
         recurrence: [
-            'RRULE:FREQ=WEEKLY'
+            'RRULE:FREQ=WEEKLY;BYDAY=' + formattedDays
         ]
     };
 
@@ -152,7 +155,7 @@ const retrieveTableData = async () =>  {
     const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
     const response = await chrome.tabs.sendMessage(tab.id, { message: 'retrieve_table_data' });
     
-    console.log('response', response)
+    // console.log('response', response)
     if (!response.elems) {
         console.error('Failed to retrieve table data');
         return;
@@ -163,15 +166,21 @@ const retrieveTableData = async () =>  {
 
 
 // create a function that displays the error on the DOM
-const displayError = (error) => {
-    const errorDiv = document.getElementById('error');
-    errorDiv.textContent = error;
-    errorDiv.style.display = 'block';
-    errorDiv.style.color = 'red';
-
+const displayMessage = (message, color) => {
+    const messageDiv = document.getElementById('message');
+    messageDiv.textContent = message;
+    messageDiv.style.display = 'block';
+    messageDiv.style.color = color;
+    messageDiv.style.fontWeight = 'bold';
+    messageDiv.style.border = '3px solid';
+    messageDiv.style.borderRadius = '10px';
+    messageDiv.style.borderColor = color;
+    messageDiv.style.padding = '5px';
+    messageDiv.style.fontSize = '10pt';
+    
     setTimeout(() => {
-        errorDiv.textContent = '';
-        errorDiv.style.display = 'none';
+        messageDiv.textContent = '';
+        messageDiv.style.display = 'none';
     }, 3000);
 
 }
