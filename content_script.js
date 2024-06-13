@@ -1,51 +1,71 @@
 
-const childIndex = (childNode) => {
-    const [...children] =  childNode.parentNode.children;
-    return children.length > 7 ? children.indexOf(childNode) - 1 : children.indexOf(childNode);
-}
-
-
-const processElement = elem => {
-    let [course, crn, time, location] = elem.innerText.split('\n');
-    let [startTime, endTime] = time.split('-');
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    const day = days[childIndex(elem)];
-    startTime = `${day} ${startTime}`;
-    endTime = `${day} ${endTime}`;
-
-    crn = crn.split(' ')[0];
-    
-    return {
-        course,
-        crn,
-        startTime,
-        endTime,
-        location,
-        day: [day]
-    
-    }
-}
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     // console.log('content_script.js received message');
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     // console.log(request);
     if (request.message === 'retrieve_table_data') {
 
-        let [...elems] = window.frames[1].document.querySelectorAll('td.ddlabel');
-        elems = elems.map(elem => processElement(elem));
-        elems = elems.reduce((acc, elem) => {
-            let key = elem.crn;
-            if (acc[key])
-                acc[key].day.push(elem.day[0]);
-            else 
-                acc[key] = elem;
-            return acc;
-        }, {});
-
-        console.log('elems', elems);
-        sendResponse({ elems: elems });
+        const data = parseTimetable();
+        sendResponse({ elems: data });
     } else {
-        sendResponse({elems: {}});
+        sendResponse({elems: []});
     }
 });
+
+
+const parseTimetable = () => {
+
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const timetable = frames[1].document.querySelector('.datadisplaytable');
+    
+    const rows = Array.from(timetable.querySelectorAll('tr'));
+    rows.shift(); 
+    let courses = {};
+    let paddingTDs = [];
+
+    rows.forEach((row, i) => {
+        const cells = row.querySelectorAll('td');
+
+        cells.forEach((cell, index) => {
+            if (cell.innerHTML.trim() === '&nbsp;')
+                return 
+            
+            let [course, crn, time, location] = cell.innerText.split('\n');
+            let day = days[index]
+            const numEmptySlots = parseInt(cell.getAttribute('rowspan')) - 1;
+            for (let j = 1; j <= numEmptySlots; j++) {
+                const nextRow = rows[i + j];
+                const emptyCell = document.createElement('td');
+                emptyCell.innerHTML = '&nbsp;';
+                emptyCell.style.display = 'none';
+                // check if row has a TH element, if so increase insertIndex by 1
+                let insertIndex = nextRow.querySelector('th') ? index + 1 : index;
+                nextRow.insertBefore(emptyCell, nextRow.children[insertIndex]);
+                paddingTDs.push(emptyCell);
+            }
+
+            if (!courses[crn]) {
+                let [startTime, endTime] = time.split('-');
+                startTime = `${day} ${startTime}`;
+                endTime = `${day} ${endTime}`;
+                courses[crn] = {
+                    course,
+                    startTime,
+                    endTime,
+                    location,
+                    days: []
+                };
+            }
+
+            courses[crn].days.push(day);
+            
+        });
+    })
+
+    // Remove padding tds
+    paddingTDs.forEach(paddingTD => {
+        paddingTD.remove();
+    });
+
+    return Object.values(courses);
+}

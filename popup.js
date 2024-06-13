@@ -84,9 +84,8 @@ const createSchedule = async (event) => {
     
     try {
         const tableData = await retrieveTableData();
-        console.log(tableData);
-        let promises = Object.values(tableData).map((eventData, index) => insertEvent(data.id, headers, eventData, index % 11 + 1))
-        // .map(eventData => insertEvent(data.id, headers, eventData, colors));
+        // console.log(tableData);
+        let promises = tableData.map((eventData, index) => insertEvent(data.id, headers, eventData, index % 11 + 1))
         let results = await Promise.all(promises);
         // console.log(results);
         displayMessage('Schedule created successfully', 'green');
