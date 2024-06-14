@@ -4,37 +4,29 @@ const getAuthToken = async () => {
     // Check localStorage for existing token
     let token = localStorage.getItem('authToken');
     if (token) {
-      // Check token expiration (optional, see explanation below)
         const expirationTime = localStorage.getItem('authTokenExpiration');
         if (expirationTime && Date.now() > expirationTime) {
-            console.warn('Token expired, fetching new one');
             chrome.identity.removeCachedAuthToken({ token: token });
             token = null; // Clear invalid token
         } else {
-            // console.log('Using existing token from localStorage');
-            // console.log(token)
             return token; // Return valid token if not expired
         }
     }
 
-    // Request new token if necessary (interactive or non-interactive)
+    
     let newToken;
     try {
         newToken = await chrome.identity.getAuthToken({ 'interactive': true });
-        // console.log(`obtained new token ${newToken}`);
     } catch (error) {
-        console.error('Failed to obtain token:', error);
-        return null;
+        throw new Error('Failed to obtain token');
     }   
 
     token = newToken.token;
-    // console.log(newToken)
     localStorage.setItem('authToken', token);
 
-    // Set expiration time (optional)
-    const expiresIn = 1800 // Access expiration details if available
+    const expiresIn = 1800
 
-    const expiration = Date.now() + expiresIn * 1000; // Convert seconds to milliseconds
+    const expiration = Date.now() + expiresIn * 1000; 
     localStorage.setItem('authTokenExpiration', expiration.toString());
 
     return token;
@@ -59,47 +51,38 @@ const createCalendar = async (calendarName, headers) => {
 
 const createSchedule = async (event) => {
     event.preventDefault();
-    const token = await getAuthToken();
-    if (!token) {
-        console.error('Failed to obtain token');
-        return;
-    }
-
-    const calendarName = document.getElementById("textin").value;
-    
-    let headers = {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-    };
-
     let data;
+    let headers
+    document.getElementById('submit').disabled = true;
+    displayMessage('Creating schedule...', 'black')
     try {
-        data = await createCalendar(calendarName, headers);
-    } catch (error) {
-        console.error(error);
-        displayMessage(error, 'red');
-        return;
-    }
-    // console.log(data);
+        const token = await getAuthToken();
+
+        const calendarName = document.getElementById("textin").value;
     
-    try {
+        headers = {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+
+        data = await createCalendar(calendarName, headers);
+            
         const tableData = await retrieveTableData();
-        // console.log(tableData);
         let promises = tableData.map((eventData, index) => insertEvent(data.id, headers, eventData, index % 11 + 1))
         let results = await Promise.all(promises);
-        // console.log(results);
         displayMessage('Schedule created successfully', 'green');
 
     } catch (error) {
-
+        if(error.message !== 'Failed to create calendar' && error.message !== 'Failed to obtain token')
+            await deleteCalendar(data.id, headers);
         console.error(error);
         displayMessage(error, 'red');
-        await deleteSchedule(data.id, headers);
-        return;
+    } finally {
+        document.getElementById('submit').disabled = false;
     }
 }
 
-const deleteSchedule = async (calendarName, headers) => {
+const deleteCalendar = async (calendarName, headers) => {
 
     let res = await fetch(`https://www.googleapis.com/calendar/v3/calendars/${calendarName}`, {
         method: 'DELETE',
@@ -110,7 +93,7 @@ const deleteSchedule = async (calendarName, headers) => {
         console.error('Failed to delete calendar:', res.status);
     }
 
-    return await res.json();
+    return await res.text();
 }
 
 const insertEvent = async (calendarName, headers, eventData, colorId) => {
@@ -125,7 +108,7 @@ const insertEvent = async (calendarName, headers, eventData, colorId) => {
         'Sunday': 'SU'
     };
 
-    let formattedDays = eventData.day.map(day => dayMapping[day]).join(',');
+    let formattedDays = eventData.days.map(day => dayMapping[day]).join(',');
     let startTime = moment(eventData.startTime, "dddd h:mm a").toISOString();
     let endTime = moment(eventData.endTime, "dddd h:mm a").toISOString();
     const body = {

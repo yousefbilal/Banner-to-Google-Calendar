@@ -64,12 +64,16 @@ div {
     
 }
 
-#submit:hover {
+#submit:hover:enabled {
     background-color: #0078d7;
     border-color: #0078d7;
 }
 
-#submit:active {
+#submit:active:enabled {
     background-color: #0056b3;
     border-color: #0056b3;
+}
+
+#submit:disabled {
+    opacity: 30%;;
 }
