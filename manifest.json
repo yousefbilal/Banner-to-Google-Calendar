@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "Hello Extensions",
-    "description": "Base Level Extension",
+    "name": "Banner to Google Calendar",
+    "description": "transfers banner schedule to google calendar",
     "version": "1.0",
     "action": {
         "default_popup": "popup.html",
