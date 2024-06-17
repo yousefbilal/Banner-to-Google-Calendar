@@ -1,36 +1,85 @@
 import moment from "moment";
 
-const getAuthToken = async () => {
-    // Check localStorage for existing token
-    let token = localStorage.getItem('authToken');
-    if (token) {
-        const expirationTime = localStorage.getItem('authTokenExpiration');
-        if (expirationTime && Date.now() > expirationTime) {
-            chrome.identity.removeCachedAuthToken({ token: token });
-            token = null; // Clear invalid token
-        } else {
-            return token; // Return valid token if not expired
-        }
-    }
+// const getAuthToken = async () => {
+//     // Check localStorage for existing token
+//     let token = localStorage.getItem('authToken');
+//     if (token) {
+//         const expirationTime = localStorage.getItem('authTokenExpiration');
+//         if (expirationTime && Date.now() > expirationTime) {
+//             chrome.identity.removeCachedAuthToken({ token: token });
+//             token = null; // Clear invalid token
+//         } else {
+//             return token; // Return valid token if not expired
+//         }
+//     }
 
     
-    let newToken;
+//     let newToken;
+//     try {
+//         newToken = await chrome.identity.getAuthToken({ 'interactive': true });
+//     } catch (error) {
+//         throw new Error('Failed to obtain token');
+//     }   
+
+//     token = newToken.token;
+//     localStorage.setItem('authToken', token);
+
+//     const expiresIn = 1800
+
+//     const expiration = Date.now() + expiresIn * 1000; 
+//     localStorage.setItem('authTokenExpiration', expiration.toString());
+
+//     return token;
+// };
+const manifest = chrome.runtime.getManifest()
+const REDIRECT_URL = chrome.identity.getRedirectURL();
+// client ID of the Web Application and NOT the chrome extension
+const CLIENT_ID = "85232819736-kvha7463v3n834f8s2gfjqfrsoefhhm0.apps.googleusercontent.com";
+const SCOPES = manifest.oauth2.scopes;
+const AUTH_URL =
+`https://accounts.google.com/o/oauth2/auth\
+?client_id=${CLIENT_ID}\
+&response_type=token\
+&redirect_uri=${encodeURIComponent(REDIRECT_URL)}\
+&scope=${encodeURIComponent(SCOPES.join(' '))}`;
+
+
+const parseResponse = (responseUri) => {
+    let responseParams = responseUri.split('#')[1];
+    responseParams = new URLSearchParams(responseParams);
+    let token = responseParams.get('access_token');
+    let expiresIn = responseParams.get('expires_in');
+    return { token, expiresIn };
+
+}
+
+const getAuthToken = async () => {
     try {
-        newToken = await chrome.identity.getAuthToken({ 'interactive': true });
+        let responseUri = await chrome.identity.launchWebAuthFlow({
+            interactive: true,
+            url: AUTH_URL
+        });
+
+        if(!responseUri) {
+            throw new Error('Failed to obtain token');
+        }
+
+        const {token, expiresIn} = parseResponse(responseUri);
+        console.log('token', token)
+        console.log('expiresIn', expiresIn)
+        if (!token || token.length < 1)
+            throw new Error('Failed to obtain token');
+
     } catch (error) {
+        console.error(error);
         throw new Error('Failed to obtain token');
-    }   
+    }
+    
 
-    token = newToken.token;
-    localStorage.setItem('authToken', token);
 
-    const expiresIn = 1800
+}
 
-    const expiration = Date.now() + expiresIn * 1000; 
-    localStorage.setItem('authTokenExpiration', expiration.toString());
 
-    return token;
-};
 
 
 const createCalendar = async (calendarName, headers) => {
@@ -57,26 +106,27 @@ const createSchedule = async (event) => {
     displayMessage('Creating schedule...', 'black')
     try {
         const token = await getAuthToken();
-
-        const calendarName = document.getElementById("textin").value;
+        console.log('token', token)
+        console.log(typeof token)
+    //     const calendarName = document.getElementById("textin").value;
     
-        headers = {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        };
+    //     headers = {
+    //         'Authorization': `Bearer ${token}`,
+    //         'Content-Type': 'application/json'
+    //     };
 
-        data = await createCalendar(calendarName, headers);
+    //     data = await createCalendar(calendarName, headers);
             
-        const tableData = await retrieveTableData();
-        let promises = tableData.map((eventData, index) => insertEvent(data.id, headers, eventData, index % 11 + 1))
-        let results = await Promise.all(promises);
-        displayMessage('Schedule created successfully', 'green');
+    //     const tableData = await retrieveTableData();
+    //     let promises = tableData.map((eventData, index) => insertEvent(data.id, headers, eventData, index % 11 + 1))
+    //     let results = await Promise.all(promises);
+    //     displayMessage('Schedule created successfully', 'green');
 
-    } catch (error) {
-        if(error.message !== 'Failed to create calendar' && error.message !== 'Failed to obtain token')
-            await deleteCalendar(data.id, headers);
-        console.error(error);
-        displayMessage(error, 'red');
+    // } catch (error) {
+    //     if(error.message !== 'Failed to create calendar' && error.message !== 'Failed to obtain token')
+    //         await deleteCalendar(data.id, headers);
+    //     console.error(error);
+    //     displayMessage(error, 'red');
     } finally {
         document.getElementById('submit').disabled = false;
     }
