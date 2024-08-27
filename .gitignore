@@ -4,6 +4,8 @@ node_modules/*
 .parcel-cache/
 dist/
 
+.DS_Store
+
 ### Hugo ###
 # Generated files by hugo
 site/public/
