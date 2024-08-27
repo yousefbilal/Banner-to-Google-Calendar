@@ -5,30 +5,36 @@
     "version": "1.0",
     "action": {
         "default_popup": "popup.html",
-        "default_icon": {           
+        "default_icon": {
             "16": "icons/16.png",
             "24": "icons/24.png",
-            "32": "icons/32.png" 
+            "32": "icons/32.png"
         }
     },
-
     "icons": {
         "16": "icons/16.png",
         "32": "icons/32.png",
         "48": "icons/48.png",
         "128": "icons/128.png"
     },
-
     "oauth2": {
-        "client_id":"85232819736-kvha7463v3n834f8s2gfjqfrsoefhhm0.apps.googleusercontent.com",
-        "scopes": ["https://www.googleapis.com/auth/calendar"]
+        "client_id": "85232819736-kvha7463v3n834f8s2gfjqfrsoefhhm0.apps.googleusercontent.com",
+        "scopes": [
+            "https://www.googleapis.com/auth/calendar"
+        ]
     },
-    "permissions": ["identity", "tabs"],
-    
+    "permissions": [
+        "identity",
+        "tabs"
+    ],
     "content_scripts": [
         {
-            "matches": ["https://banner.aus.edu/*"],
-            "js": ["content_script.js"]
+            "matches": [
+                "https://banner.aus.edu/*"
+            ],
+            "js": [
+                "content_script.js"
+            ]
         }
     ]
 }

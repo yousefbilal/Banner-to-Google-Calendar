@@ -13,19 +13,21 @@ Disclaimer: you might have to login in using your Google account when using the 
 
 ## Building the extension
 
-Since Manifest V3, Web extensions can't import scripts from CDNs directly into the extension, and hence using a bundler is required for importing external scripts. The only package used in this project is `moment.js` for date/time formatting. 
+Since Manifest V3, Web extensions can't import scripts from CDNs directly into the extension, and hence using a bundler is required for importing external scripts. The only package used in this project is `moment.js` for date/time formatting.
 
 NPM is used in this project and the dependencies are listed under `package.json`. They can be installed using the command:
+
 ```console
 npm install
 ```
 
 The bundler I used for this project is [parcel](https://github.com/parcel-bundler/parcel); however, any other bundler can be used. The development dependencies can be installed using:
+
 ```console
 npm install --also=dev
 ```
 
-The build scripts are already inside `package.json`. The `build:test` script is bundled without optimization and was used for testing and debugging. The built program will be under `dist/`. 
+The build scripts are already inside `package.json`. The `build:test` script is bundled without optimization and was used for testing and debugging. The built program will be under `dist/`.
 
 ```console
 npm run build

@@ -13,19 +13,19 @@ const dayMapping = {
 
 const getAuthToken = async () => {
   // Check localStorage for existing token
-  let token = localStorage.getItem("authToken");
+  let authToken = localStorage.getItem("authToken");
   const expirationTime = localStorage.getItem("authTokenExpiration");
-  if (token && expirationTime && Date.now() < expirationTime) {
-    return token; // Return valid token if not expired
+  if (authToken && expirationTime && Date.now() < expirationTime) {
+    return authToken;
   }
 
   const { token: newToken, expiresIn } = await requestToken();
-  token = newToken;
-  localStorage.setItem("authToken", token);
+  authToken = newToken;
+  localStorage.setItem("authToken", authToken);
 
   const expiration = Date.now() + expiresIn * 1000; //convert to msec
   localStorage.setItem("authTokenExpiration", expiration.toString());
-  return token;
+  return authToken;
 };
 
 const parseResponse = (responseUri) => {
@@ -88,8 +88,10 @@ const createCalendar = async (calendarName, headers) => {
 const createSchedule = async () => {
   let data;
   let headers;
+
   document.getElementById("submit").disabled = true;
   displayMessage("Creating schedule...", "black");
+
   try {
     const token = await getAuthToken();
     const calendarName = document.getElementById("textin").value;
@@ -105,7 +107,7 @@ const createSchedule = async () => {
     let promises = tableData.map((eventData, index) =>
       insertEvent(data.id, headers, eventData, (index % 11) + 1)
     );
-    let results = await Promise.all(promises);
+    await Promise.all(promises);
     displayMessage("Schedule created successfully", "green", 5000);
   } catch (error) {
     if (
