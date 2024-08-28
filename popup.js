@@ -104,8 +104,9 @@ const createSchedule = async () => {
     calendarData = await createCalendar(calendarName, headers);
 
     const tableData = await retrieveTableData();
+    const colorId = document.getElementById("color-select").value
     let promises = tableData.map((eventData, index) =>
-      insertEvent(calendarData.id, headers, eventData, (index % 11) + 1)
+      insertEvent(calendarData.id, headers, eventData, colorId === "default" ? (index % 11) + 1 : colorId)
     );
     await Promise.all(promises);
     displayMessage("Schedule created successfully", "green");
