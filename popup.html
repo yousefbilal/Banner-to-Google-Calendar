@@ -1,37 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <title>Banner -> Google Calendar</title>
+  <title>AUS Banner to Google Calendar</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="popup.css" />
-  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
 </head>
 
 <body>
-  <form id="form">
-    <div>Banner to Google Calendar</div>
-    <div id="message"></div>
-    <input class="textin" id="textin" type="text" placeholder="Calendar name" required />
-    <div class="color-selector">
-      <label for="color-select">Event Color:</label>
-      <select id="color-select">
-        <option value="default">Different color for each course</option>
-        <option value="4">Red</option>
-        <option value="2">Green</option>
-        <option value="1">Blue</option>
-      </select>
-    </div>
-    <div class="row">
-      <button id="submit" class="button" type="submit" value="submit">
-        submit
-      </button>
-      <button class="button" type="submit" value="ical">export iCal</button>
-    </div>
-  </form>
-
+  <div class="container">
+    <h1>AUS Banner to Google Calendar</h1>
+    <form id="form">
+      <div class="input-group">
+        <input class="calendar-name" id="calendar-name" type="text" placeholder="Calendar name" required />
+      </div>
+      <div class="input-group">
+        <label for="color-select">Event Color:</label>
+        <select id="color-selector" class="color-selector">
+          <option value="default">Different color for each course</option>
+          <option value="4">Red</option>
+          <option value="2">Green</option>
+          <option value="1">Blue</option>
+        </select>
+      </div>
+      <div id="message" class="message"></div>
+      <div class="button-group">
+        <button type="submit" id="submit" class="button" name="action" value="submit">Create Schedule</button>
+        <button type="submit" id="ical" class="button" name="action" value="ical">Export iCal</button>
+      </div>
+    </form>
+  </div>
   <script type="module" src="popup.js"></script>
 </body>
 

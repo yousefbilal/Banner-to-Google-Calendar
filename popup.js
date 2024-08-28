@@ -1,6 +1,12 @@
 import moment from "moment";
 import { createEvents } from "ics";
 
+const MessageType = {
+  INFO: "info",
+  ERROR: "error",
+  SUCCESS: "success",
+}
+
 const dayMapping = {
   Monday: "MO",
   Tuesday: "TU",
@@ -90,26 +96,25 @@ const createSchedule = async () => {
   let headers;
 
   document.getElementById("submit").disabled = true;
-  displayMessage("Creating schedule...", "black");
+  displayMessage("Creating schedule...", MessageType.INFO);
 
   try {
     const token = await getAuthToken();
-    const calendarName = document.getElementById("textin").value;
-
     headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
 
+    const calendarName = document.getElementById("calendar-name").value;
     calendarData = await createCalendar(calendarName, headers);
 
     const tableData = await retrieveTableData();
-    const colorId = document.getElementById("color-select").value
+    const colorId = document.getElementById("color-selector").value
     let promises = tableData.map((eventData, index) =>
       insertEvent(calendarData.id, headers, eventData, colorId === "default" ? (index % 11) + 1 : colorId)
     );
     await Promise.all(promises);
-    displayMessage("Schedule created successfully", "green");
+    displayMessage("Schedule created successfully", MessageType.SUCCESS);
   } catch (error) {
     if (
       error.message !== "Failed to create calendar" &&
@@ -117,7 +122,7 @@ const createSchedule = async () => {
     )
       await deleteCalendar(calendarData.id, headers);
     console.error(error);
-    displayMessage("Something went wrong! 🥲\nTry reloading banner and opening the 'Student Schedule by Day & Time' tab", "red");
+    displayMessage("Something went wrong! 🥲\nTry reloading banner and opening the 'Student Schedule by Day & Time' tab", MessageType.ERROR);
   } finally {
     document.getElementById("submit").disabled = false;
   }
@@ -169,7 +174,6 @@ const insertEvent = async (calendarName, headers, eventData, colorId) => {
   );
 
   if (!res.ok) {
-    console.error("Failed to insert event:", res.status);
     throw new Error("Failed to insert event");
   }
 
@@ -191,7 +195,7 @@ const retrieveTableData = async () => {
 };
 
 const downloadIcal = async () => {
-  const calendarName = document.getElementById("textin").value;
+  const calendarName = document.getElementById("calendar-name").value;
   const fileName = calendarName + ".ics";
   const tableData = await retrieveTableData();
   const { error, value } = createEvents(
@@ -226,12 +230,11 @@ const downloadIcal = async () => {
   URL.revokeObjectURL(url);
 };
 
-const displayMessage = (message, color) => {
+const displayMessage = (message, type) => {
   const messageDiv = document.getElementById("message");
   messageDiv.innerHTML = message.replace(/\n/g, "<br>");
   messageDiv.style.display = "block";
-  messageDiv.style.color = color;
-  messageDiv.style.textAlign = "center";
+  messageDiv.className = `message ${type}`;
 };
 
 document.getElementById("form").onsubmit = async (event) => {
