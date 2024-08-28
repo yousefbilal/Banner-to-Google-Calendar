@@ -92,21 +92,18 @@ const createCalendar = async (calendarName, headers) => {
 };
 
 const createSchedule = async () => {
-  let calendarData;
-  let headers;
-
   document.getElementById("submit").disabled = true;
   displayMessage("Creating schedule...", MessageType.INFO);
 
   try {
     const token = await getAuthToken();
-    headers = {
+    const headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
 
     const calendarName = document.getElementById("calendar-name").value;
-    calendarData = await createCalendar(calendarName, headers);
+    const calendarData = await createCalendar(calendarName, headers);
 
     const tableData = await retrieveTableData();
     const colorId = document.getElementById("color-selector").value

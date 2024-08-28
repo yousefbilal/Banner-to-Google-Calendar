@@ -1,4 +1,4 @@
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
   if (request.message === "retrieve_table_data") {
     const data = parseTimetable();
     sendResponse({ elems: data });
