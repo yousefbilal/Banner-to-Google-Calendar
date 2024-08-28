@@ -108,7 +108,7 @@ const createSchedule = async () => {
       insertEvent(data.id, headers, eventData, (index % 11) + 1)
     );
     await Promise.all(promises);
-    displayMessage("Schedule created successfully", "green", 5000);
+    displayMessage("Schedule created successfully", "green");
   } catch (error) {
     if (
       error.message !== "Failed to create calendar" &&
@@ -116,7 +116,7 @@ const createSchedule = async () => {
     )
       await deleteCalendar(data.id, headers);
     console.error(error);
-    displayMessage(error, "red", 5000);
+    displayMessage(error, "red");
   } finally {
     document.getElementById("submit").disabled = false;
   }
@@ -208,7 +208,7 @@ const downloadIcal = async () => {
   );
   if (error) {
     console.error(error);
-    displayMessage("Failed to create iCal file", "red", 5000);
+    displayMessage("Failed to create iCal file", "red");
     return;
   }
   const file = new File([value], fileName, { type: "text/calendar" });
@@ -224,17 +224,11 @@ const downloadIcal = async () => {
   URL.revokeObjectURL(url);
 };
 
-const displayMessage = (message, color, timeout) => {
+const displayMessage = (message, color) => {
   const messageDiv = document.getElementById("message");
   messageDiv.textContent = message;
   messageDiv.style.display = "block";
   messageDiv.style.color = color;
-  if (timeout)
-    setTimeout(() => {
-      messageDiv.textContent = "";
-      messageDiv.style.display = "none";
-    }, timeout);
-
 };
 
 document.getElementById("form").onsubmit = async (event) => {
