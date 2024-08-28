@@ -180,7 +180,6 @@ const retrieveTableData = async () => {
     message: "retrieve_table_data",
   });
 
-  // console.log('response', response)
   if (!response.elems) {
     console.error("Failed to retrieve table data");
     return;
