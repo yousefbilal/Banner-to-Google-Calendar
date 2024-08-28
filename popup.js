@@ -86,7 +86,7 @@ const createCalendar = async (calendarName, headers) => {
 };
 
 const createSchedule = async () => {
-  let data;
+  let calendarData;
   let headers;
 
   document.getElementById("submit").disabled = true;
@@ -101,11 +101,11 @@ const createSchedule = async () => {
       "Content-Type": "application/json",
     };
 
-    data = await createCalendar(calendarName, headers);
+    calendarData = await createCalendar(calendarName, headers);
 
     const tableData = await retrieveTableData();
     let promises = tableData.map((eventData, index) =>
-      insertEvent(data.id, headers, eventData, (index % 11) + 1)
+      insertEvent(calendarData.id, headers, eventData, (index % 11) + 1)
     );
     await Promise.all(promises);
     displayMessage("Schedule created successfully", "green");
@@ -114,7 +114,7 @@ const createSchedule = async () => {
       error.message !== "Failed to create calendar" &&
       error.message !== "Failed to obtain token"
     )
-      await deleteCalendar(data.id, headers);
+      await deleteCalendar(calendarData.id, headers);
     console.error(error);
     displayMessage(error, "red");
   } finally {
