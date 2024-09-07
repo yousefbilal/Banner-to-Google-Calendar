@@ -34,6 +34,7 @@ form {
   outline: none;
   border-color: #0078d7;
 }
+
 .button {
   font-size: 10pt;
   padding: 5px;
@@ -81,7 +82,6 @@ input[type="radio"] {
   display: none;
 }
 
-/* Create a custom radio button */
 .custom-radio {
   display: inline-block;
   width: 20px;
@@ -91,7 +91,6 @@ input[type="radio"] {
   cursor: pointer;
 }
 
-/* Create the inner dot for the checked state */
 .custom-radio::after {
   content: "";
   display: block;
@@ -106,8 +105,7 @@ input[type="radio"] {
   opacity: 0;
 }
 
-/* Show the inner dot when checked */
-input[type="radio"]:checked + .custom-radio::after {
+input[type="radio"]:checked+.custom-radio::after {
   opacity: 1;
 }
 
@@ -119,15 +117,13 @@ input[type="radio"]:checked + .custom-radio::after {
 }
 
 .none-color {
-  background: repeating-linear-gradient(
-    90deg,
-    #ff887c 0,
-    #ff887c 5px,
-    #ffb878 5px,
-    #ffb878 10px,
-    #51b749 10px,
-    #51b749 15px,
-    #5484ed 15px,
-    #5484ed 20px
-  );
+  background: repeating-linear-gradient(90deg,
+      #ff887c 0,
+      #ff887c 5px,
+      #ffb878 5px,
+      #ffb878 10px,
+      #51b749 10px,
+      #51b749 15px,
+      #5484ed 15px,
+      #5484ed 20px);
 }

@@ -1,36 +1,30 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Banner -> Google Calendar</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="popup.css" />
-    <meta charset="utf-8" />
-  </head>
-  <body>
-    <form id="form">
-      <div>Banner to Google Calendar</div>
-      <div id="message"></div>
-      <input
-        class="textin"
-        id="textin"
-        type="text"
-        placeholder="Calendar name"
-        required
-      />
-      <div id="color-picker"></div>
-      <div class="row">
-        <button id="submit" class="button" type="submit" value="submit">
-          submit
-        </button>
-        <button class="button" type="submit" value="ical">export iCal</button>
-      </div>
-    </form>
 
-    <script type="module" src="popup.js"></script>
-  </body>
+<head>
+  <title>Banner -> Google Calendar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="popup.css" />
+  <meta charset="utf-8" />
+</head>
+
+<body>
+  <form id="form">
+    <div>Banner to Google Calendar</div>
+    <div id="message"></div>
+    <input class="textin" id="textin" type="text" placeholder="Calendar name" required />
+    <div id="color-picker"></div>
+    <div class="row">
+      <button id="submit" class="button" type="submit" value="submit">
+        submit
+      </button>
+      <button class="button" type="submit" value="ical">export iCal</button>
+    </div>
+  </form>
+
+  <script type="module" src="popup.js"></script>
+</body>
+
 </html>
