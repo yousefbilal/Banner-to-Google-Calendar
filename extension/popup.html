@@ -1,29 +1,37 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <title>Banner -> Google Calendar</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="popup.css" />
-  <meta charset="utf-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banner to Google Calendar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="popup.css">
 </head>
 
 <body>
-  <form id="form">
-    <div>Banner to Google Calendar</div>
-    <div id="message"></div>
-    <input class="textin" id="textin" type="text" placeholder="Calendar name" required />
-    <div id="color-picker"></div>
-    <div class="row">
-      <button id="submit" class="button" type="submit" value="submit">
-        submit
-      </button>
-      <button class="button" type="submit" value="ical">export iCal</button>
-    </div>
-  </form>
-
+  <div class="container">
+    <h1>Banner to Google Calendar</h1>
+    <form id="form">
+      <div id="message" class="message"></div>
+      <div class="input-group">
+        <input class="textin" id="textin" type="text" placeholder="" required>
+        <label for="textin">Calendar name</label>
+      </div>
+      <div class="color-picker-container">
+        <label>Select color:</label>
+        <div id="color-picker" class="color-picker"></div>
+      </div>
+      <div class="button-group">
+        <button id="submit" class="button primary" type="submit" value="submit">
+          Create Calendar
+        </button>
+        <button id="export" class="button secondary" type="button" value="ical">
+          Export iCal
+        </button>
+      </div>
+    </form>
+  </div>
   <script type="module" src="popup.js"></script>
 </body>
 

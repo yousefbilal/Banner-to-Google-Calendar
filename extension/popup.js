@@ -31,22 +31,31 @@ const colors = [
   "#dc2127",
 ];
 
-const createColorOption = (colorId, color, isChecked = false) => {
-  const elementString = `
-        <label>
-          <input type="radio" name="colorPicker" value=${colorId}>
-          <span class="custom-radio"></span>
-        </label>
-        `;
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(elementString, "text/html");
-  const element = doc.body.firstChild;
-  const spanElement = doc.getElementsByTagName("span")[0];
-  if (color) spanElement.style.backgroundColor = color;
-  else spanElement.classList.add("none-color");
-  doc.getElementsByTagName("input")[0].checked = isChecked;
-  return element;
-};
+const createColorOption = (color, index) => {
+  const colorOption = document.createElement("div");
+  colorOption.className = "color-option";
+  colorOption.style.backgroundColor = color;
+  colorOption.dataset.colorId = index === -1 ? "-1" : index + 1;
+  colorOption.addEventListener("click", () => selectColor(colorOption));
+  return colorOption;
+}
+
+const selectColor = (colorOption) => {
+  document.querySelectorAll(".color-option").forEach(el => el.classList.remove("selected"));
+  colorOption.classList.add("selected");
+}
+
+const initializeColorPicker = () => {
+  const colorPicker = document.getElementById("color-picker");
+
+  const noneColor = createColorOption(null, -1);
+  noneColor.classList.add("none-color", "selected");
+  colorPicker.appendChild(noneColor);
+
+  colors.forEach((color, index) => {
+    colorPicker.appendChild(createColorOption(color, index));
+  });
+}
 
 const getAuthToken = async () => {
   let token = localStorage.getItem("authToken");
@@ -189,115 +198,95 @@ const retrieveTableData = async () => {
   return elems;
 };
 
-const createSchedule = async () => {
-  let calendarData;
-  let headers;
+const handleCreateCalendar = async (event) => {
+  event.preventDefault();
+  const submitButton = document.getElementById("submit");
+  submitButton.disabled = true;
+  displayMessage("Creating schedule...", "info");
 
-  document.getElementById("submit").disabled = true;
-  displayMessage("Creating schedule...", "black");
   try {
     const token = await getAuthToken();
     const calendarName = document.getElementById("textin").value;
+    const tableData = await retrieveTableData();
 
-    headers = {
+    const headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
 
-    const tableData = await retrieveTableData();
+    const calendarData = await createCalendar(calendarName, headers);
 
-    calendarData = await createCalendar(calendarName, headers);
+    const selectedColorId = document.querySelector(".color-option.selected").dataset.colorId;
 
-    const selectedColorId = document.querySelector(
-      'input[name="colorPicker"]:checked'
-    ).value;
-
-    let promises;
-    if (selectedColorId === "-1") {
-      promises = tableData.map((eventData, index) =>
-        insertEvent(calendarData.id, headers, eventData, (index % 11) + 1)
-      );
-    } else {
-      promises = tableData.map((eventData) =>
-        insertEvent(calendarData.id, headers, eventData, selectedColorId)
-      );
-    }
+    const promises = tableData.map((eventData, index) =>
+      insertEvent(calendarData.id, headers, eventData, selectedColorId === "-1" ? (index % 11) + 1 : selectedColorId)
+    );
 
     await Promise.all(promises);
-    displayMessage("Schedule created successfully", "green");
+    displayMessage("Schedule created successfully", "success");
   } catch (error) {
-    if (error instanceof EventError)
-      await deleteCalendar(calendarData.id, headers);
-
     console.error(error);
-    displayMessage(`Something went wrong! 🥲\nTry reloading banner and opening the 'Student Schedule by Day & Time' tab.`, "red");
+    displayMessage('Failed to create calendar!\nTry reloading banner and opening the "Student Schedule by Day & Time" tab.', "error");
   } finally {
-    document.getElementById("submit").disabled = false;
+    submitButton.disabled = false;
   }
-};
+}
 
 const downloadIcal = async () => {
+  const calendarName = document.getElementById("textin").value || "AUS-Schedule";
+  const fileName = calendarName + ".ics";
+  const tableData = await retrieveTableData();
+  const { error, value } = createEvents(
+    tableData.map((eventData) => {
+      return {
+        title: eventData.course,
+        location: eventData.location,
+        calName: calendarName,
+        start: moment(eventData.startTime, "dddd h:mm a").toDate().getTime(),
+        end: moment(eventData.endTime, "dddd h:mm a").toDate().getTime(),
+        recurrenceRule:
+          "FREQ=WEEKLY;BYDAY=" +
+          eventData.days.map((day) => dayMapping[day]).join(","),
+      };
+    })
+  );
+  if (error) {
+    throw new ParsingError("Failed to create iCal file");
+  }
+
+  const file = new File([value], fileName, { type: "text/calendar" });
+  const url = URL.createObjectURL(file);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = fileName;
+
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+
+  URL.revokeObjectURL(url);
+}
+
+const displayMessage = (message, type) => {
+  const messageElement = document.getElementById("message");
+  messageElement.innerHTML = message.replace(/\n/g, "<br>");
+  messageElement.className = `message ${type}`;
+}
+
+const handleExportIcal = async () => {
   try {
-    const calendarName = document.getElementById("textin").value;
-    const fileName = calendarName + ".ics";
-    const tableData = await retrieveTableData();
-    const { error, value } = createEvents(
-      tableData.map((eventData) => {
-        return {
-          title: eventData.course,
-          location: eventData.location,
-          calName: calendarName,
-          start: moment(eventData.startTime, "dddd h:mm a").toDate().getTime(),
-          end: moment(eventData.endTime, "dddd h:mm a").toDate().getTime(),
-          recurrenceRule:
-            "FREQ=WEEKLY;BYDAY=" +
-            eventData.days.map((day) => dayMapping[day]).join(","),
-        };
-      })
-    );
-    if (error) {
-      throw new ParsingError("Failed to create iCal file");
-    }
-
-    const file = new File([value], fileName, { type: "text/calendar" });
-    const url = URL.createObjectURL(file);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = fileName;
-
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
-
-    URL.revokeObjectURL(url);
-  } catch (error) {
-    console.error("Failed to create iCal file");
-    displayMessage("Failed to create iCal file", "red");
-  }
-};
-
-const displayMessage = (message, color) => {
-  const messageDiv = document.getElementById("message");
-  messageDiv.innerHTML = message.replace(/\n/g, "<br>");
-  messageDiv.textContent = message;
-  messageDiv.style.display = "block";
-  messageDiv.style.color = color;
-  messageDiv.style.textAlign = "center";
-};
-
-document.getElementById("form").onsubmit = async (event) => {
-  event.preventDefault();
-  if (event.submitter.value === "submit") {
-    await createSchedule();
-  } else if (event.submitter.value === "ical") {
     await downloadIcal();
+    displayMessage("iCal file exported successfully!", "success");
+  } catch (error) {
+    console.error(error);
+    displayMessage('Failed to export iCal file!\nTry reloading banner and opening the "Student Schedule by Day & Time" tab.', "error");
   }
-};
+}
 
-const colorPicker = document.getElementById("color-picker");
+const form = document.getElementById("form");
+form.addEventListener("submit", handleCreateCalendar);
 
-colorPicker.appendChild(createColorOption(-1, null, true));
+const exportButton = document.getElementById("export");
+exportButton.addEventListener("click", handleExportIcal);
 
-colors.forEach((color, index) => {
-  colorPicker.appendChild(createColorOption(index + 1, color));
-});
+initializeColorPicker();
