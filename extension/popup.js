@@ -204,17 +204,19 @@ const handleCreateCalendar = async (event) => {
   submitButton.disabled = true;
   displayMessage("Creating schedule...", "info");
 
+  let calendarCreated, headers, calendarName;
   try {
     const token = await getAuthToken();
-    const calendarName = document.getElementById("textin").value;
+    calendarName = document.getElementById("textin").value;
     const tableData = await retrieveTableData();
 
-    const headers = {
+    headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
 
     const calendarData = await createCalendar(calendarName, headers);
+    calendarCreated = true;
 
     const selectedColorId = document.querySelector(".color-option.selected").dataset.colorId;
 
@@ -226,6 +228,9 @@ const handleCreateCalendar = async (event) => {
     displayMessage("Schedule created successfully", "success");
   } catch (error) {
     console.error(error);
+    if (calendarCreated) {
+      await deleteCalendar(calendarName, headers);
+    }
     displayMessage('Failed to create calendar!\nTry reloading banner and opening the "Student Schedule by Day & Time" tab.', "error");
   } finally {
     submitButton.disabled = false;
