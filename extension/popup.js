@@ -279,10 +279,6 @@ const displayMessage = (message, color) => {
   messageDiv.textContent = message;
   messageDiv.style.display = "block";
   messageDiv.style.color = color;
-  setTimeout(() => {
-    messageDiv.textContent = "";
-    messageDiv.style.display = "none";
-  }, 5000);
 };
 
 document.getElementById("form").onsubmit = async (event) => {
