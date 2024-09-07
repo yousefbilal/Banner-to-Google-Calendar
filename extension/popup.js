@@ -147,7 +147,7 @@ const deleteCalendar = async (calendarName, headers) => {
   return await res.text();
 };
 
-const insertEvent = async (calendarName, headers, eventData, colorId) => {
+const insertEvent = async (calendarId, headers, eventData, colorId) => {
   const formattedDays = eventData.days.map((day) => dayMapping[day]).join(",");
   const startTime = moment(eventData.startTime, "dddd h:mm a").toISOString();
   const endTime = moment(eventData.endTime, "dddd h:mm a").toISOString();
@@ -168,7 +168,7 @@ const insertEvent = async (calendarName, headers, eventData, colorId) => {
   };
 
   const res = await fetch(
-    `https://www.googleapis.com/calendar/v3/calendars/${calendarName}/events`,
+    `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events`,
     {
       method: "POST",
       headers: headers,
@@ -218,13 +218,13 @@ const handleCreateCalendar = async (event) => {
     };
 
     const tableData = await retrieveTableData();
-    const promises = tableData.map((eventData, index) =>
-      insertEvent(calendarData.id, headers, eventData, selectedColorId === "-1" ? (index % 11) + 1 : selectedColorId)
-    );
 
-    const calendarData = await createCalendar(calendarName, headers);
+    const { id: calendarId } = await createCalendar(calendarName, headers);
     calendarCreated = true;
 
+    const promises = tableData.map((eventData, index) =>
+      insertEvent(calendarId, headers, eventData, selectedColorId === "-1" ? (index % 11) + 1 : selectedColorId)
+    );
     await Promise.all(promises);
 
     displayMessage("Schedule created successfully", "success");
