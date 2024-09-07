@@ -3,7 +3,7 @@ import { createEvents } from "ics";
 import {
   AuthenticationError,
   CalendarCreationError,
-  EventError,
+  InsertEventError as EventInsertionError,
   ParsingError,
 } from "./errors";
 
@@ -99,15 +99,15 @@ const requestToken = async () => {
       url: AUTH_URL,
     })
     .catch((error) => {
-      throw new AuthenticationError("Failed to obtain token " + error);
+      throw new AuthenticationError("Failed to obtain token. Error: " + error);
     });
 
   if (!responseUri) {
-    throw new AuthenticationError("Failed to obtain token");
+    throw new AuthenticationError("Invalid `responseUri`");
   }
 
   const { token, expiresIn } = parseAuthResponse(responseUri);
-  if (!token) throw new AuthenticationError("Failed to obtain token");
+  if (!token) throw new AuthenticationError("Invalid `token`");
 
   return { token, expiresIn };
 };
@@ -120,11 +120,11 @@ const createCalendar = async (calendarName, headers) => {
       summary: calendarName,
     }),
   }).catch((error) => {
-    throw new CalendarCreationError("Failed to create calendar " + error);
+    throw new CalendarCreationError("Failed to create calendar. Error: " + error);
   });
 
   if (!res.ok) {
-    throw new CalendarCreationError("Failed to create calendar");
+    throw new CalendarCreationError("Response not OK. Status: " + res.status);
   }
 
   return await res.json();
@@ -175,11 +175,11 @@ const insertEvent = async (calendarName, headers, eventData, colorId) => {
       body: JSON.stringify(body),
     }
   ).catch((error) => {
-    throw new EventError("Failed to insert event" + error);
+    throw new EventInsertionError("Failed to insert event" + error);
   });
 
   if (!res.ok) {
-    throw new EventError("Failed to insert event");
+    throw new EventInsertionError("Failed to insert event");
   }
 
   return await res.json();
