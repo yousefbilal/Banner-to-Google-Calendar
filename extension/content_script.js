@@ -14,7 +14,7 @@ const messageHandlers = {
   },
 };
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, _, sendResponse) => {
   const handler = messageHandlers[request.message] || messageHandlers.default;
   const response = handler();
   sendResponse(response);

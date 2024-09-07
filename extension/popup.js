@@ -142,6 +142,7 @@ const insertEvent = async (calendarName, headers, eventData, colorId) => {
   const formattedDays = eventData.days.map((day) => dayMapping[day]).join(",");
   const startTime = moment(eventData.startTime, "dddd h:mm a").toISOString();
   const endTime = moment(eventData.endTime, "dddd h:mm a").toISOString();
+
   const body = {
     summary: eventData.course,
     location: eventData.location,
@@ -191,6 +192,7 @@ const retrieveTableData = async () => {
 const createSchedule = async () => {
   let calendarData;
   let headers;
+
   document.getElementById("submit").disabled = true;
   displayMessage("Creating schedule...", "black");
   try {
@@ -228,7 +230,7 @@ const createSchedule = async () => {
       await deleteCalendar(calendarData.id, headers);
 
     console.error(error);
-    displayMessage(error.message, "red");
+    displayMessage(`Something went wrong! 🥲\nTry reloading banner and opening the 'Student Schedule by Day & Time' tab.`, "red");
   } finally {
     document.getElementById("submit").disabled = false;
   }
@@ -276,9 +278,11 @@ const downloadIcal = async () => {
 
 const displayMessage = (message, color) => {
   const messageDiv = document.getElementById("message");
+  messageDiv.innerHTML = message.replace(/\n/g, "<br>");
   messageDiv.textContent = message;
   messageDiv.style.display = "block";
   messageDiv.style.color = color;
+  messageDiv.style.textAlign = "center";
 };
 
 document.getElementById("form").onsubmit = async (event) => {
