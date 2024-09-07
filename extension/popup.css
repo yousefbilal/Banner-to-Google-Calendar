@@ -1,38 +1,44 @@
 :root {
   --primary-color: #4285F4;
-  --secondary-color: #34A853;
-  --background-color: #FFFFFF;
-  --text-color: #202124;
-  --error-color: #EA4335;
-  --success-color: #34A853;
+  --dark-primary-color: #3367D6;
+
+  --background-color: #F5F5F5;
+  --text-color: #333333;
+  --light-text-color: #5F6368;
+
+  --selected-color-border: #202124;
+  --textin-border-color: #DADCE0;
+
+  --error-color: #D93025;
+  --error-background-color: #FDECEA;
+
+  --success-color: #1E8E3E;
+  --success-background-color: #E6F4EA;
+
+  --info-background-color: #E8F0FE;
   --info-color: #4285F4;
-  --border-color: #DADCE0;
 }
 
 h1 {
   font-size: 18px;
-  font-weight: 600;
-  margin: 0;
   text-align: center;
+  margin-bottom: 20px;
+  color: var(--primary-color);
 }
 
 .container {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 10px;
+  width: 300px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: "Roboto", sans-serif;
   font-size: 14px;
-  line-height: 1.5;
   color: var(--text-color);
-  background-color: var(--background-color);
   margin: 0;
-  padding: 20px;
-  width: 300px;
-  box-sizing: border-box;
+  padding: 0;
+  background-color: var(--background-color);
 }
 
 form {
@@ -44,7 +50,7 @@ form {
 .textin {
   width: calc(100% - 24px);
   padding: 12px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--textin-border-color);
   border-radius: 8px;
   font-size: 14px;
   transition: border-color 0.3s, box-shadow 0.3s;
@@ -58,6 +64,7 @@ form {
 
 .button-group {
   display: flex;
+  justify-content: space-between;
   gap: 10px;
 }
 
@@ -71,8 +78,16 @@ form {
   transition: background-color 0.3s, box-shadow 0.3s;
 }
 
-.button:hover {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.button:hover:enabled {
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.1);
+}
+
+.button.primary:hover:enabled {
+  background-color: var(--dark-primary-color);
+}
+
+.button.secondary:hover:enabled {
+  background-color: whitesmoke;
 }
 
 .button:active {
@@ -103,17 +118,17 @@ form {
 }
 
 .message.info {
-  background-color: #E8F0FE;
+  background-color: var(--info-background-color);
   color: var(--info-color);
 }
 
 .message.error {
-  background-color: #FDECEA;
+  background-color: var(--error-background-color);
   color: var(--error-color);
 }
 
 .message.success {
-  background-color: #E6F4EA;
+  background-color: var(--success-background-color);
   color: var(--success-color);
 }
 
@@ -126,14 +141,14 @@ form {
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #5F6368;
+  color: var(--light-text-color);
   transition: all 0.3s;
   pointer-events: none;
 }
 
 .textin:focus+label,
 .textin:not(:placeholder-shown)+label {
-  top: 0;
+  top: -9px;
   font-size: 12px;
   background-color: var(--background-color);
   padding: 0 4px;
@@ -162,7 +177,7 @@ form {
 
 .color-option.selected {
   border-radius: 50%;
-  border-color: var(--text-color);
+  border-color: var(--selected-color-border);
 }
 
 .color-option:hover {
