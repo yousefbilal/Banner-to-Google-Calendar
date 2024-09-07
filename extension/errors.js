@@ -12,7 +12,7 @@ export class CalendarCreationError extends Error {
   }
 }
 
-export class InsertEventError extends Error {
+export class EventInsertionError extends Error {
   constructor(message) {
     super(message);
     this.name = this.constructor.name;

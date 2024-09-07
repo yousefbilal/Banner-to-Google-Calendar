@@ -3,7 +3,7 @@ import { createEvents } from "ics";
 import {
   AuthenticationError,
   CalendarCreationError,
-  InsertEventError as EventInsertionError,
+  EventInsertionError,
   ParsingError,
 } from "./errors";
 
@@ -200,31 +200,33 @@ const retrieveTableData = async () => {
 
 const handleCreateCalendar = async (event) => {
   event.preventDefault();
+
   const submitButton = document.getElementById("submit");
   submitButton.disabled = true;
+
   displayMessage("Creating schedule...", "info");
 
-  let calendarCreated, headers, calendarName;
+  const calendarName = document.getElementById("textin").value;
+  const selectedColorId = document.querySelector(".color-option.selected").dataset.colorId;
+
+  let calendarCreated, headers;
   try {
     const token = await getAuthToken();
-    calendarName = document.getElementById("textin").value;
-    const tableData = await retrieveTableData();
-
     headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
 
-    const calendarData = await createCalendar(calendarName, headers);
-    calendarCreated = true;
-
-    const selectedColorId = document.querySelector(".color-option.selected").dataset.colorId;
-
+    const tableData = await retrieveTableData();
     const promises = tableData.map((eventData, index) =>
       insertEvent(calendarData.id, headers, eventData, selectedColorId === "-1" ? (index % 11) + 1 : selectedColorId)
     );
 
+    const calendarData = await createCalendar(calendarName, headers);
+    calendarCreated = true;
+
     await Promise.all(promises);
+
     displayMessage("Schedule created successfully", "success");
   } catch (error) {
     console.error(error);
