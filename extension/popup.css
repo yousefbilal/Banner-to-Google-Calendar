@@ -154,16 +154,34 @@ form {
 .color-option {
   width: 24px;
   height: 24px;
-  border-radius: 50%;
+  border-radius: 30%;
   cursor: pointer;
   border: 2px solid transparent;
   transition: border-color 0.3s;
 }
 
 .color-option.selected {
+  border-radius: 50%;
   border-color: var(--text-color);
 }
 
+.color-option:hover {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
 .none-color {
+  position: relative;
+}
+
+.none-color::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: conic-gradient(#FF887C 0deg 90deg, #FFB878 90deg 180deg, #51B749 180deg 270deg, #5484ED 270deg 360deg);
+  z-index: -1;
+  margin: -2px;
+  border-radius: inherit;
 }
