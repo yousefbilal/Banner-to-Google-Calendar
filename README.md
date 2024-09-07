@@ -1,39 +1,47 @@
 # Banner to Google Calendar
 
-This is a Web Extension made to automatically export the entries of the schedule on banner.aus.edu to Google Calendar.
+This is a Chrome Extension made to automatically export your AUS schedule from banner.aus.edu to your Google Calendar.
 
 ## Usage
 
-To use the extension you need to be under **Student Schedule by Day and Time**, then click on the extension icon, then name the calendar that will be exported to Google Calendar.
+To use the extension you need to be under "***Student Schedule by Day and Time***", then click on the extension icon, then name the calendar that will be exported to Google Calendar.
 
-Disclaimer: you might have to login in using your Google account when using the program for the first time in order to obtain oauth2 access token since the program uses the Chrome identity API.
+Note: you might have to login in using your Google account when using the program for the first time in order to obtain oauth2 access token since the program uses the Chrome identity API.
 
-![image](https://github.com/yousefbilal/Banner-to-Google-Calendar/assets/50619491/1b8dfe69-009c-47f3-967f-d8f337fc199a)
-![image](https://github.com/yousefbilal/Banner-to-Google-Calendar/assets/50619491/1728773e-f2dc-4e8c-80c6-d39dd9830c9b)
+![extension-demo](./assets/extension-demo.png)
+![calendar-demo](./assets/calendar-demo.png)
 
-## Building the extension
+## Building the extension from source
 
-Since Manifest V3, Web extensions can't import scripts from CDNs directly into the extension, and hence using a bundler is required for importing external scripts. The only package used in this project is `moment.js` for date/time formatting. 
+Since Manifest V3, Web extensions can't import scripts from CDNs directly into the extension, and hence using a bundler is required for importing external scripts. The only package used in this project is `moment.js` for date/time formatting.
 
 NPM is used in this project and the dependencies are listed under `package.json`. They can be installed using the command:
+
 ```console
-npm install
+npm install --prefix extension/
 ```
 
-The bundler I used for this project is [parcel](https://github.com/parcel-bundler/parcel); however, any other bundler can be used. The development dependencies can be installed using:
+The bundler used for this project is [parcel](https://github.com/parcel-bundler/parcel). However, any other bundler can be used. The development dependencies can be installed using:
+
 ```console
-npm install --also=dev
+npm install --prefix extension/ --include=dev 
 ```
 
-The build scripts are already inside `package.json`. The `build:test` script is bundled without optimization and was used for testing and debugging. The built program will be under `dist/`. 
+The build scripts are already inside `package.json`.
+
+Use the `build` script to bundle the extension with optimization.
+
+Use the `build:test` script to bundle the extension without optimization. This is useful for faster builds when testing and debugging.
 
 ```console
-npm run build
+npm run --prefix extension/ build
 # OR
-npm run build:test
+npm run --prefix extension/ build:test 
 ```
 
-In case of using other bundlers, you have the option of writing the build scripts insider `package.json`:
+By default, the built program will be under `extension/dist/`.
+
+In case of using other bundlers, you have the option of writing the build scripts inside `extension/package.json`:
 
 ```json
 "scripts": {
@@ -44,9 +52,9 @@ In case of using other bundlers, you have the option of writing the build script
 and run it using:
 
 ```console
-npm run build
+npm run --prefix extension/ build
 ```
 
 ## Loading the extension
 
-In order to load the extension into the browser, go to `Manage extensions` in your browser. Make sure that developer mode is enable and then `Load unpacked` option will appear. Click on `Load unpacked` and select the directory that contains the built extension (build instructions above)
+To load the extension in your browser, type `chrome://extensions/` in the search bar or click on the three dots at the top right corner, then select `Extensions` and `Manage Extensions`. Ensure that developer mode is enabled so that the option `Load unpacked` appears. After that, click `Load unpacked` and choose the directory containing the built extension (should be `extension/dist` by default).
